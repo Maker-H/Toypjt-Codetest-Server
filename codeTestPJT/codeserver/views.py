@@ -33,11 +33,14 @@ def check_view(request):
     file_path = os.getcwd() + "\\codeserver\\testcase\\output.txt"
     outputs = []
     with open(file_path, 'r') as f:
+        tmp = []
         line = f.readline()
-        # print(f.readlines())
+
         while line:
             if line != '\n':
-                outputs.append(line.strip('\n'))
+                tmp = line.strip('\n').split()
+            elif line == '\n':
+                outputs.append(tmp)
             line = f.readline()
 
     # answer 코드를 answer.txt에 추가하기
@@ -48,9 +51,23 @@ def check_view(request):
             line = f.writelines(user_output['answer'])
     
     # 테스트 케이스 값 넣기
-    command = f'echo 1 | python {code_file_path}'
-    result = subprocess.run(command, text=True, shell=True, stdout=subprocess.PIPE).stdout
-    result = list(result)
-    
-    return HttpResponse(json.dumps(outputs), content_type='application/json')
+
+    for i, input in enumerate(test_inputs):
+        command = f'echo {input} | python {code_file_path}'
+        result = subprocess.run(command, text=True, shell=True, stdout=subprocess.PIPE).stdout
+        result = list(result)
+
+        cnt = 0
+        output = outputs[i]
+        for out in output:
+            # print('out: ', out, 'result', result[cnt])
+            if result[cnt] == '\n':
+                cnt += 1
+
+            if result[cnt] != out:
+                return HttpResponse('failed')
+            cnt += 1
+                        
+
+    return HttpResponse('success')
     
