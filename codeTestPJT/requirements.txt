@@ -1,6 +1,6 @@
 asgiref==3.7.2
 csrf==0.1b1
-Django==4.2.3
+Django==4.2.7
 django-cors-headers==4.1.0
 djangorestframework==3.14.0
 pytz==2023.3
